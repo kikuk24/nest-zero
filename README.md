@@ -1,4 +1,7 @@
 🇮🇩 [Baca versi Bahasa Indonesia](./README.id.md)
+<p align="center">
+  <img src="https://blogger.googleusercontent.com/img/a/AVvXsEjWze3a-83ZfufvHCwCXUbJArVFOISUVf66dGYHaQ6MknBalveNaaGK-N-0I4ZegpcK-Z6haxg5baB0IZabMsI3DivSamutVh_EOM38KVNYgrTCXA1aBeAWib9tg6gx_NJc3caOzq9EA9ryiexN5MgNehHotbr_gUvSpgYVNvwOMmTeWS1A2E1CH_9ooBBj" alt="Nest Zero Logo" width="300"/>
+</p>
 
 # 🚀 Nest Zero
 
