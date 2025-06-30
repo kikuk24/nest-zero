@@ -2,7 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
-import { PrismaService } from './prima.service';
+import { PrismaService } from './prisma.service';
 import { ValidationService } from './validation.service';
 @Global()
 @Module({
