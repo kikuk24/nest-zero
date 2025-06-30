@@ -112,6 +112,52 @@ export class AuthService {
         }
     }
 
+    async validateOAuthLogin(
+        email: string,
+        name: string,
+        avatarUrl: string | undefined,
+        provider: string,
+    ): Promise<LoginResponse> {
+        this.logger.info(`OAuth login attempt for email: ${email}`);
+
+        const user = await this.prismaService.user.upsert({
+            where: { email },
+            update: {
+                name,
+                avatarUrl,
+                provider: provider as any, // Cast to the correct enum type if you are sure it's valid
+            },
+            create: {
+                email,
+                name,
+                avatarUrl,
+                provider: provider as any, // Cast to the correct enum type if you are sure it's valid
+                password: Math.random().toString(36).slice(-8), // Generate a random password for OAuth users
+            },
+        });
+
+        const payload = { userId: user.id, email: user.email, role: user.role };
+
+        const accessToken = await this.jwtService.signAsync(payload, {
+            expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
+        });
+
+        const refreshToken = await this.jwtService.signAsync(payload, {
+            secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+            expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
+        });
+
+        await this.prismaService.user.update({
+            where: { id: user.id },
+            data: { refreshToken },
+        });
+
+        this.logger.info(`User ${user.email} logged in via OAuth successfully`);
+
+        return new LoginResponse({ accessToken, refreshToken });
+    }
+
+
     async logout(userId: number): Promise<void> {
         this.logger.info(`User logout attempt for userId: ${userId}`);
 
