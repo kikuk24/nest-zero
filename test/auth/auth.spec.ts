@@ -4,6 +4,8 @@ import * as request from 'supertest';
 import { AppModule } from 'src/app.module';
 import { PrismaService } from 'src/common/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { GoogleStrategy } from 'src/auth/strategies/google.strategy';
+import { MockGoogleStrategy } from './mocks/mock-google.strategy';
 
 describe('AuthController (e2e)', () => {
     let app: INestApplication;
@@ -12,7 +14,9 @@ describe('AuthController (e2e)', () => {
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AppModule],
-        }).compile();
+        }).overrideProvider(GoogleStrategy)
+            .useClass(MockGoogleStrategy)
+            .compile();
 
         app = moduleFixture.createNestApplication();
         prisma = moduleFixture.get<PrismaService>(PrismaService);
@@ -144,4 +148,13 @@ describe('AuthController (e2e)', () => {
         expect(meRes.body.data).toHaveProperty('email', 'test@example.com');
         expect(meRes.body.data).toHaveProperty('id');
     });
+    it('should login via mocked Google OAuth', async () => {
+        const response = await request(app.getHttpServer())
+            .get('/api/auth/google/callback')
+            .expect(200);
+
+        expect(response.body.data.accessToken).toBeDefined();
+        expect(response.body.data.refreshToken).toBeDefined();
+    });
+
 });
