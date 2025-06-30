@@ -31,6 +31,7 @@ describe('UserController - register', () => {
         const request: RegisterUserRequest = {
             email: 'test@example.com',
             password: 'password123',
+            confirmPassword: 'password123',
             name: 'Test User',
             provider: AuthProvider.LOCAL,
             isActive: true,
