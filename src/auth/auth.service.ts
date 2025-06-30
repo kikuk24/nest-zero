@@ -13,6 +13,7 @@ import { AuthValidation } from './auth.validation';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { OAuthProfile } from 'src/model/oauth-profile.model';
 
 @Injectable()
 export class AuthService {
@@ -112,27 +113,20 @@ export class AuthService {
         }
     }
 
-    async validateOAuthLogin(
-        email: string,
-        name: string,
-        avatarUrl: string | undefined,
-        provider: string,
-    ): Promise<LoginResponse> {
+    async validateOAuthLogin(profile: OAuthProfile): Promise<LoginResponse> {
+        const { email, name, avatarUrl, provider } = profile;
+
         this.logger.info(`OAuth login attempt for email: ${email}`);
 
         const user = await this.prismaService.user.upsert({
             where: { email },
-            update: {
-                name,
-                avatarUrl,
-                provider: provider as any, // Cast to the correct enum type if you are sure it's valid
-            },
+            update: { name, avatarUrl, provider },
             create: {
                 email,
                 name,
                 avatarUrl,
-                provider: provider as any, // Cast to the correct enum type if you are sure it's valid
-                password: Math.random().toString(36).slice(-8), // Generate a random password for OAuth users
+                provider,
+                password: 'OAUTH_USER_DO_NOT_LOGIN_WITH_PASSWORD',
             },
         });
 

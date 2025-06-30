@@ -49,19 +49,15 @@ export class AuthController {
 
     @Get('google/callback')
     @UseGuards(AuthGuard('google'))
-    async googleCallback(@Req() req: Request): Promise<WebResponse<LoginResponse>> {
-        const user = req.user as {
-            email: string;
-            name: string;
-            avatarUrl?: string;
-        };
-
-        const result = await this.authService.validateOAuthLogin(
-            user.email,
-            user.name,
-            user.avatarUrl,
-            AuthProvider.GOOGLE,
-        );
+    async googleCallback(
+        @User() user: { email: string; name: string; avatarUrl?: string },
+    ): Promise<WebResponse<LoginResponse>> {
+        const result = await this.authService.validateOAuthLogin({
+            email: user.email,
+            name: user.name,
+            avatarUrl: user.avatarUrl,
+            provider: AuthProvider.GOOGLE,
+        });
 
         return {
             data: result,
@@ -69,28 +65,29 @@ export class AuthController {
         };
     }
 
-        @Get('me')
-        @UseGuards(JwtAuthGuard)
-        async getMe(@User() user: any): Promise < WebResponse < MeResponse >> {
-            const result = await this.authService.getMe(user.userId);
-            return {
-                message: 'User profile fetched successfully',
-                data: result,
-            };
-        }
 
-
-
-
-        @UseGuards(JwtAuthGuard)
-        @Post('logout')
-        @HttpCode(200)
-        async logout(@Req() req: Request): Promise < WebResponse < void>> {
-            const user = req.user as any;
-            await this.authService.logout(user.userId);
-            return {
-                message: 'Logout successful',
-            };
-        }
-
+    @Get('me')
+    @UseGuards(JwtAuthGuard)
+    async getMe(@User() user: any): Promise<WebResponse<MeResponse>> {
+        const result = await this.authService.getMe(user.userId);
+        return {
+            message: 'User profile fetched successfully',
+            data: result,
+        };
     }
+
+
+
+
+    @UseGuards(JwtAuthGuard)
+    @Post('logout')
+    @HttpCode(200)
+    async logout(@Req() req: Request): Promise<WebResponse<void>> {
+        const user = req.user as any;
+        await this.authService.logout(user.userId);
+        return {
+            message: 'Logout successful',
+        };
+    }
+
+}
