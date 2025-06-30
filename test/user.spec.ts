@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
-import { AppModule } from 'src/app.module';
+import * as request from 'supertest';
 import { TestService } from './test.service';
-import { PrismaService } from 'src/common/prima.service';
+import { PrismaService } from 'src/common/prisma.service';
+import { AppModule } from 'src/app.module';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication;
@@ -29,6 +29,7 @@ describe('UserController (e2e)', () => {
         .send({
           email: 'test@example.com',
           password: 'password123',
+          confirmPassword: 'password123',
           name: 'Test User',
           provider: 'LOCAL',
           isActive: true,
@@ -52,6 +53,7 @@ describe('UserController (e2e)', () => {
         .send({
           email: 'test@example.com', // email sama dengan user dummy
           password: 'password123',
+          confirmPassword: 'password123',
           name: 'Test User Duplicate',
           provider: 'LOCAL',
           isActive: true,
@@ -62,6 +64,23 @@ describe('UserController (e2e)', () => {
       expect(response.body).toHaveProperty('message');
       expect(response.body.message).toMatch(/already exists/i);
     });
+  });
+  it('should fail if passwords do not match', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/api/user/register')
+      .send({
+        email: 'test@example.com',
+        password: 'password123',
+        confirmPassword: 'differentPassword',
+        name: 'Test User',
+        provider: 'LOCAL',
+        isActive: true,
+      })
+      .expect(400);
+
+    expect(response.body).toHaveProperty('statusCode', 400);
+    expect(response.body).toHaveProperty('message');
+    expect(response.body.message).toMatch(/Passwords do not match/i);
   });
 
   afterEach(async () => {

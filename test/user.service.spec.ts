@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from 'src/user/user.service';
 import { ValidationService } from 'src/common/validation.service';
-import { PrismaService } from 'src/common/prima.service';
+import { PrismaService } from 'src/common/prisma.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { AuthProvider } from 'generated/prisma';
@@ -67,6 +67,7 @@ describe('UserService - registerUser', () => {
         const request = {
             email: 'test@example.com',
             password: 'securePass123',
+            confirmPassword: 'securePass123',
             name: 'Test User',
             avatarUrl: undefined,
             provider: AuthProvider.LOCAL,
@@ -92,6 +93,7 @@ describe('UserService - registerUser', () => {
         const request = {
             email: 'duplicate@example.com',
             password: 'securePass123',
+            confirmPassword: 'securePass123',
             name: 'Dup User',
             avatarUrl: undefined,
             provider: AuthProvider.LOCAL,
@@ -107,6 +109,7 @@ describe('UserService - registerUser', () => {
         const request = {
             email: 'hash@example.com',
             password: 'myPass123',
+            confirmPassword: 'myPass123',
             name: 'Hash Test',
             avatarUrl: undefined,
             provider: AuthProvider.LOCAL,
@@ -115,5 +118,19 @@ describe('UserService - registerUser', () => {
         await service.registerUser(request);
 
         expect(hashSpy).toHaveBeenCalledWith(request.password, 10);
+    });
+    it('should throw error if passwords do not match', async () => {
+        const request = {
+            email: 'mismatch@example.com',
+            password: 'myPass123',
+            confirmPassword: 'wrongPass123',
+            name: 'Hash Test',
+            avatarUrl: undefined,
+            provider: AuthProvider.LOCAL,
+        };
+
+        await expect(service.registerUser(request)).rejects.toThrow(
+            "Passwords do not match",
+        );
     });
 });
