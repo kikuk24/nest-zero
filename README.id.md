@@ -71,12 +71,6 @@ Jalankan seluruh unit & e2e test:
 npm run test
 ```
 
-Jalankan hanya e2e test:
-
-```bash
-npm run test:e2e
-```
-
 
 
 ## 📬 Endpoint Utama
