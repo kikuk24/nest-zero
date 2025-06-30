@@ -1,6 +1,7 @@
 export class RegisterUserRequest {
     email: string;
     password: string;
+    confirmPassword: string;
     name?: string;
     provider?: string; // enum: LOCAL, GOOGLE, FACEBOOK, GITHUB
     avatarUrl?: string;
