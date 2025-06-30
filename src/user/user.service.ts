@@ -1,6 +1,6 @@
 import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
-import { PrismaService } from "src/common/prima.service";
+import { PrismaService } from "src/common/prisma.service";
 import { ValidationService } from "src/common/validation.service";
 import { RegisterUserRequest, UserResponse } from "src/model/user.model";
 import { Logger } from "winston";
@@ -33,6 +33,9 @@ export class UserService {
                 `User with email ${registerRequest.email} already exists`,
                 400,
             );
+        }
+        if (registerRequest.password !== registerRequest.confirmPassword) {
+            throw new HttpException("Passwords do not match", 400);
         }
 
         const hashedPassword = await bcrypt.hash(registerRequest.password, 10);
