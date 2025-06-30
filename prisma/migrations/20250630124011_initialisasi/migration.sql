@@ -8,7 +8,7 @@ CREATE TABLE `User` (
     `avatarUrl` VARCHAR(191) NULL,
     `role` VARCHAR(191) NOT NULL DEFAULT 'USER',
     `isActive` BOOLEAN NOT NULL DEFAULT true,
-    `refreshToken` VARCHAR(191) NULL,
+    `refreshToken` TEXT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
